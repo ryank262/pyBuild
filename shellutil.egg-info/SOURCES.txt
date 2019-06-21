@@ -1,0 +1,7 @@
+setup.py
+shellutil/__init__.py
+shellutil.egg-info/PKG-INFO
+shellutil.egg-info/SOURCES.txt
+shellutil.egg-info/dependency_links.txt
+shellutil.egg-info/not-zip-safe
+shellutil.egg-info/top_level.txt
