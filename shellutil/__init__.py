@@ -17,12 +17,12 @@ def __shell(cmd, env_vars=None, should_return_output=False, continue_if_fail=Fal
 
     # needs to be surrounded with single quotes,
     # otherwise inner double quotes need to be escaped
-    formatted_cmd = f"/bin/bash -c '{cmd}'"
+    formatted_cmd = "/bin/bash -c " + cmd
     if env_vars is not None:
         for k, v in env_vars.items():
             env[k] = v
     try:
-        print(f'`{cmd}`')
+        print(cmd)
 
         if should_return_output:
             output = subprocess.run(formatted_cmd, env=env, shell=True, check=True, text=True, stdout=subprocess.PIPE).stdout

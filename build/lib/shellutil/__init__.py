@@ -7,6 +7,11 @@ import re
 import time
 import glob
 
+import future        # pip install future
+import builtins      # pip install future
+import past          # pip install future
+import six           # pip install six
+
 def __shell(cmd, env_vars=None, should_return_output=False, continue_if_fail=False, suppress_output=False):
     env = os.environ.copy()
 
