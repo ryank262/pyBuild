@@ -8,34 +8,54 @@ import time
 import glob
 
 import future        # pip install future
-import builtins      # pip install future
-import past          # pip install future
 import six           # pip install six
 
 def __shell(cmd, env_vars=None, should_return_output=False, continue_if_fail=False, suppress_output=False):
     env = os.environ.copy()
 
-    # needs to be surrounded with single quotes,
-    # otherwise inner double quotes need to be escaped
-    formatted_cmd = "/bin/bash -c " + cmd
-    if env_vars is not None:
-        for k, v in env_vars.items():
-            env[k] = v
-    try:
-        print(cmd)
+    if sys.version_info.major == 3:
 
-        if should_return_output:
-            output = subprocess.run(formatted_cmd, env=env, shell=True, check=True, text=True, stdout=subprocess.PIPE).stdout
-            if not suppress_output:
+        # needs to be surrounded with single quotes,
+        # otherwise inner double quotes need to be escaped
+        formatted_cmd = "/bin/bash -c '{}'".format(cmd)        
+        if env_vars is not None:
+            for k, v in env_vars.items():
+                env[k] = v
+        try:
+            #print(f'`{cmd}`') 
+            print("{}".format(cmd))
+
+            if should_return_output:
+                output = subprocess.run(formatted_cmd, env=env, shell=True, check=True, text=True, stdout=subprocess.PIPE).stdout
+                if not suppress_output:
+                    print(output)
+                return output.strip()
+            else:
+                std_out = subprocess.DEVNULL if suppress_output else None
+                subprocess.run(formatted_cmd, env=env, shell=True, check=True, text=True, stdout=std_out)
+
+        except subprocess.CalledProcessError as error:
+            if not continue_if_fail:
+                raise error
+
+    else:
+
+        cmd = "/bin/bash -c '{}'".format(cmd)
+        if env_vars is not None:
+            for k, v in env_vars.items():
+                env[k] = v
+        try:
+            print(cmd)
+
+            if should_return_output:
+                output = subprocess.check_output(cmd, env=env, shell=True)
                 print(output)
-            return output.strip()
-        else:
-            std_out = subprocess.DEVNULL if suppress_output else None
-            subprocess.run(formatted_cmd, env=env, shell=True, check=True, text=True, stdout=std_out)
+                return output
+            else:
+                subprocess.call(cmd, env=env, shell=True)
 
-    except subprocess.CalledProcessError as error:
-        if not continue_if_fail:
-            raise error
+        except subprocess.CalledProcessError as error:
+            sys.exit(error.returncode)
 
 
 def shell_value(cmd, continue_if_fail=False, suppress_output=False):
